@@ -1,11 +1,27 @@
 # Mini Orders Dashboard
 
-Мини-продукт для тестового задания “AI Tools Specialist”: импорт mock-заказов в RetailCRM, webhook + backfill синхронизация в Supabase, Telegram-уведомления по high-value orders и server-side dashboard на Next.js.
+Мини-продукт для тестового задания “AI Tools Specialist”: импорт mock-заказов в RetailCRM, синхронизация заказов в Supabase, Telegram-уведомления по high-value orders и server-side dashboard на Next.js.
+
+## Deliverables
+
+- Live URL: [https://mini-orders-dashboard-vicaram02.vercel.app](https://mini-orders-dashboard-vicaram02.vercel.app)
+- Repository: [https://github.com/AmeliaVicar/Dashboard-](https://github.com/AmeliaVicar/Dashboard-)
+- Telegram notification screenshot:
+
+![Telegram notification](docs/telegram-notification.png)
+
+- Demo Telegram verification: уведомления проверялись в личном test chat с ботом `RetailCRM_BOT`
+
+## Demo status
+
+- Реализованы оба контура синхронизации: `webhook` и `scheduled backfill`
+- В текущем demo-окружении RetailCRM не было доступа к настройке webhook из UI, поэтому фактически проверенный рабочий путь синхронизации для ревью — `scheduled backfill`
+- Webhook route при этом реализован, задеплоен и отдельно проверен ручным POST-запросом
 
 ## Что сделано
 
 - Одноразовый импорт `mock_orders.json -> RetailCRM`
-- Основной sync path: `RetailCRM webhook -> Next.js API route -> Supabase upsert -> Telegram`
+- Реализован основной sync path: `RetailCRM webhook -> Next.js API route -> Supabase upsert -> Telegram`
 - Страховочный sync path: `Vercel Cron -> backfill route -> RetailCRM REST API -> Supabase upsert -> Telegram`
 - Server-side dashboard без прямого чтения Supabase из браузера
 - Идемпотентный upsert и защита от дублей Telegram-уведомлений
@@ -187,6 +203,35 @@ npm install
 npm run dev
 ```
 
+## How to verify
+
+Короткий сценарий для ревью:
+
+1. Импортировать исходные mock-заказы:
+
+```bash
+npm run import:mock-orders
+```
+
+2. Запустить backfill-синхронизацию:
+
+```bash
+npm run sync:backfill
+```
+
+3. Открыть dashboard на Vercel или локально и проверить:
+   - `total orders`
+   - `total revenue`
+   - `average order value`
+   - `count of orders > threshold`
+
+4. Проверить, что в таблице последних заказов появились импортированные заказы из RetailCRM
+5. Создать или обновить в RetailCRM заказ с суммой выше `TELEGRAM_THRESHOLD_KZT`
+6. Повторно запустить backfill и убедиться, что:
+   - заказ попал в Supabase
+   - пришло Telegram-уведомление
+   - повторный backfill не отправляет дубль уведомления
+
 ## Импорт mock_orders.json в RetailCRM
 
 Скрипт: `scripts/import-mock-orders.ts`
@@ -306,6 +351,13 @@ Page: `src/app/page.tsx`
 - Telegram bot не добавлен в нужный чат
 - в RetailCRM фильтры list orders могут отличаться в конкретной инсталляции
 
+## Known limitations
+
+- В demo-аккаунте RetailCRM не было доступа к включению webhook из UI, поэтому end-to-end проверка шла через `scheduled backfill`
+- В этом аккаунте RetailCRM код `orderType=eshop-individual` отсутствовал, и его пришлось адаптировать через env override
+- Фильтры `updatedAtFrom` / `updatedAtTo` не поддерживались аккаунтом, поэтому в backfill добавлен fallback на full scan pagination
+- Webhook path реализован и проверен вручную, но не был включён как основной production-trigger в этом конкретном окружении
+
 ## Live integration findings
 
 - В текущем окружении не было доступа к настройке webhook в интерфейсе RetailCRM. Поэтому в финальной демонстрации основным фактически используемым контуром синхронизации стал `scheduled backfill`, а webhook route оставлен реализованным и дополнительно проверен ручным POST-запросом.
@@ -317,6 +369,16 @@ Page: `src/app/page.tsx`
 ## AI usage
 
 AI использовался как технический помощник, а не как замена инженерных решений.
+
+### Реальные AI prompts
+
+Ниже примеры реальных промптов, которые использовались в ходе работы:
+
+1. `Нужно реализовать тестовое задание “AI Tools Specialist” так, чтобы итоговое решение было сильнее типовых публичных решений по похожему заданию.`
+2. `Проанализируй файл mock_orders.json и подготовь маппинг данных в формат заказа RetailCRM API.`
+3. `Теперь создай TypeScript script для импорта заказов из mock_orders.json в RetailCRM через API.`
+4. `Сделай webhook + backfill архитектуру с идемпотентностью, upsert в Supabase и защитой от дублей Telegram-уведомлений.`
+5. `Подготовь README с честным описанием AI usage, проблем и решений, без воды.`
 
 Что реально помогло:
 
