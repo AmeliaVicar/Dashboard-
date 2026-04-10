@@ -366,11 +366,7 @@ Page: `src/app/page.tsx`
 - Для reference-only webhook payload вида `{"id": 41}` пришлось отдельно поправить parser и fetch по RetailCRM, чтобы route не пытался трактовать такой payload как полный заказ.
 - RetailCRM не принимает произвольный `limit` в list orders. Валидные значения: `20`, `50`, `100`.
 
-## AI usage
-
-AI использовался как технический помощник, а не как замена инженерных решений.
-
-### Реальные AI prompts
+### Реальные AI prompts (Codex)
 
 Ниже примеры реальных промптов, которые использовались в ходе работы:
 
@@ -397,18 +393,3 @@ AI использовался как технический помощник, а
 - точки интеграции RetailCRM изолированы в одном client слое
 - mapping опирается на фактический `mock_orders.json`
 - для уведомлений добавлен atomic claim в Postgres, а не только boolean-флаг
-
-## Self-review
-
-Что получилось сильным:
-
-- цельный full-stack repo вместо набора разрозненных частей
-- server-side dashboard
-- два sync-контура: webhook + backfill
-- идемпотентность и защита от duplicate notifications
-
-Что я бы усилил следующим шагом, если бы было ещё время:
-
-- добавить интеграционный smoke test на sync core
-- вынести dashboard aggregates в SQL view/RPC для больших объёмов
-- точнее подстроить RetailCRM webhook parser под payload конкретного аккаунта
