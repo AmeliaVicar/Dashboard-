@@ -308,6 +308,7 @@ Page: `src/app/page.tsx`
 
 ## Live integration findings
 
+- В текущем окружении не было доступа к настройке webhook в интерфейсе RetailCRM. Поэтому в финальной демонстрации основным фактически используемым контуром синхронизации стал `scheduled backfill`, а webhook route оставлен реализованным и дополнительно проверен ручным POST-запросом.
 - В реальном аккаунте RetailCRM код `orderType=eshop-individual` отсутствовал. Для импорта пришлось использовать `RETAILCRM_DEFAULT_ORDER_TYPE=main`.
 - Фильтры `filter[updatedAtFrom]` / `filter[updatedAtTo]` не поддерживались этим конкретным RetailCRM аккаунтом. Поэтому backfill реализован с fallback на full scan pagination.
 - Для reference-only webhook payload вида `{"id": 41}` пришлось отдельно поправить parser и fetch по RetailCRM, чтобы route не пытался трактовать такой payload как полный заказ.
