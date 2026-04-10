@@ -8,7 +8,8 @@
 - Repository: [https://github.com/AmeliaVicar/Dashboard-](https://github.com/AmeliaVicar/Dashboard-)
 - Telegram notification screenshot:
 
-![Telegram notification](docs/telegram-notification.png)
+![Telegram notification](<img width="393" height="412" alt="image" src="https://github.com/user-attachments/assets/f4e28edc-54bb-45d3-a25b-3805657c6b7a" />
+)
 
 - Demo Telegram verification: уведомления проверялись в личном test chat с ботом `RetailCRM_BOT`
 
