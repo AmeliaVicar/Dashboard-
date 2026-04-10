@@ -1,0 +1,16 @@
+.next
+node_modules
+.env
+.env.local
+.env.production.local
+.env.development.local
+.vercel
+.idea
+.venv
+dist
+coverage
+*.log
+*.tsbuildinfo
+__pycache__
+*.pyc
+main.py
